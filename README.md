@@ -14,4 +14,4 @@ drop the .json into /data as "solar-system.json" AFTER you git clone.
 
 ```docker-compose run loadsheets python ./loadData.py oneshot```
 
-```docker-compose up
+```docker-compose up```
