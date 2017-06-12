@@ -5,13 +5,14 @@ services:
   vis:
     build:
       context: vis
-    ports:
-      - 3000:3000
-    volumes:
-      - ./vis:/app:z
     links:
       - d2r
       - loadsheets
+    environment:
+      - VIRTUAL_HOST=ons.floop.org.uk
+      - LETSENCRYPT_HOST=ons.floop.org.uk
+      - LETSENCRYPT_EMAIL=alex@floop.org.uk
+    restart: always
 
   sqldb:
     image: mariadb:10
@@ -22,30 +23,27 @@ services:
       - MYSQL_PASSWORD=system
     volumes:
       - mariadb:/var/lib/mysql:z
+    restart: always
 
   d2r:
     image: cloudfluff/d2r
-    ports:
-      - 2020:2020
     volumes:
-      - ./data:/var/lib/d2rq:z
+      - solardata:/var/lib/d2rq:z
     environment:
       - D2R_BASEURI=http://localhost:3000/
     links:
       - sqldb
+    restart: always
 
   loadsheets:
     build:
       context: sheets
     volumes:
-      - ./data:/data:z
-      - ./sheets:/usr/local/sheets:z
-    ports:
-      - 80:80
+      - solardata:/data:z
     links:
       - sqldb
-    command: python loadData.py
-    entrypoint: bash wait-for-it.sh sqldb:3306 -t 0 --
+    restart: always
 
 volumes:
   mariadb:
+  solardata:
