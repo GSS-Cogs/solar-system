@@ -33,7 +33,7 @@ services:
     volumes:
       - solardata:/var/lib/d2rq:z
     environment:
-      - D2R_BASEURI=http://localhost:3000/
+      - D2R_BASEURI=https://ons.floop.org.uk/
     links:
       - sqldb
     restart: always
