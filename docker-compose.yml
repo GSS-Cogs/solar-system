@@ -13,6 +13,9 @@ services:
       - LETSENCRYPT_HOST=ons.floop.org.uk
       - LETSENCRYPT_EMAIL=alex@floop.org.uk
     restart: always
+    networks:
+      - cloudfluff_proxy
+      - default
 
   sqldb:
     image: mariadb:10
@@ -47,3 +50,7 @@ services:
 volumes:
   mariadb:
   solardata:
+
+networks:
+  cloudfluff_proxy:
+    external: true
