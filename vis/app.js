@@ -26,6 +26,7 @@ var urlparse = require('url');
 
 var topicvis = require('./routes/topicvis');
 var fdpvis = require('./routes/fdpvis');
+var familyvis = require('./routes/familyvis');
 
 /* var auth = function (req, res, next) {
   function unauthorized(res) {
@@ -79,6 +80,7 @@ app.get('/fdp', function(req, res) {
   res.redirect(301, '/ons/');
 });
 app.use('/ons/', fdpvis);
+app.use('/family/', familyvis)
 app.get('/', function(req, res) {
   res.render('index', {title: 'Solar System of Statistics'});
 });
