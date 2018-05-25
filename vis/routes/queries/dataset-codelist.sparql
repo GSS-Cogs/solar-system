@@ -1,0 +1,16 @@
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+SELECT ?dataset ?codelist ?codelistlabel
+WHERE {
+  ?dataset a qb:DataSet;
+       qb:structure/qb:component/qb:dimension ?dimension .
+    
+  FILTER EXISTS {
+    ?obs ?dimension ?code ;
+  }
+  
+  ?code skos:inScheme ?codelist .
+  ?codelist rdfs:label ?codelistlabel .
+} GROUP BY ?dataset ?codelist ?codelistlabel

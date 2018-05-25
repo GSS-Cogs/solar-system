@@ -17,6 +17,11 @@
 var express = require('express');
 var router = express.Router();
 var sparql = require('sparql');
+var fs = require('fs');
+var path = require('path');
+
+dsDimsQuery = fs.readFileSync(path.resolve(__dirname, 'queries/dataset-dimensions.sparql')).toString();
+dsCodesQuery = fs.readFileSync(path.resolve(__dirname, 'queries/dataset-codelist.sparql')).toString();
 
 router.get('/', function(req, res, next) {
   if (req.originalUrl.slice(-1) != '/') {
@@ -28,16 +33,7 @@ router.get('/', function(req, res, next) {
 
 router.get('/dsdims', function(req, res, next) {
   var client = new sparql.Client('https://production-drafter-ons-alpha.publishmydata.com/v1/sparql/live');
-  client.rows('PREFIX qb: <http://purl.org/linked-data/cube#>\n' +
-    'PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n' +
-    '\n' +
-    'SELECT DISTINCT ?dataset ?datalabel ?dimension ?dimlabel\n' +
-    'WHERE {\n' +
-    '  ?dataset a qb:DataSet;\n' +
-    '       rdfs:label ?datalabel;\n' +
-    '       qb:structure/qb:component/qb:dimension ?dimension .\n' +
-    '  ?dimension rdfs:label ?dimlabel .\n' +
-    '}\n', function(error, rows) {
+  client.rows(dsDimsQuery, function(error, rows) {
     if (error) {
       res.render('error', {message: 'Error running SPARQL', error: error[1]});
     } else {
@@ -56,6 +52,29 @@ router.get('/dsdims', function(req, res, next) {
         dimensions[row.dimension.value] = row.dimlabel.value;
       });
       res.json({datasets: datasets, dimensions: dimensions});
+    }
+  });
+});
+
+router.get('/dscodes', function(req, res, next) {
+  var client = new sparql.Client('https://production-drafter-ons-alpha.publishmydata.com/v1/sparql/live');
+  client.rows(dsCodesQuery, function(error, rows) {
+    if (error) {
+      res.render('error', {message: 'Error running SPARQL', error: error[1]});
+    } else {
+      var datasets = {};
+      var codelists = {};
+      rows.forEach(function(row) {
+        if (!datasets.hasOwnProperty(row.dataset.value)) {
+          datasets[row.dataset.value] = {
+            codelists: [row.codelist.value]
+          };
+        } else {
+          datasets[row.dataset.value].codelists.push(row.codelist.value);
+        }
+        codelists[row.codelist.value] = row.codelistlabel.value;
+      });
+      res.json({datasets: datasets, codelists: codelists});
     }
   });
 });
