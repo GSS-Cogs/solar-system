@@ -75,9 +75,9 @@ forceManyBodySubset.initialize = function (nodes) {
 var simulation = d3.forceSimulation()
   .force("link", d3.forceLink().id(function (d) {
     return d.id;
-  }).distance(100))
-  .force("charge", d3.forceManyBody().strength(-100))
-  .force("collide", d3.forceCollide(20))
+  }).distance(300))
+  .force("charge", d3.forceManyBody().strength(-2000))
+  .force("collide", d3.forceCollide(60))
   .force("center", d3.forceCenter(width / 2, height / 2));
 
 var tooltip = d3.select("body").append("div")
@@ -93,7 +93,7 @@ d3.json('dsdims', function (dsdims) {
   for (dataset in dsdims.datasets) {
     nodes.push({
       id: dataset,
-      name: dsdims.datasets[dataset].label,
+      label: dsdims.datasets[dataset].label,
       context: dsdims.datasets[dataset].family,
       type: 'dataset'
     });
@@ -130,7 +130,6 @@ d3.json('dsdims', function (dsdims) {
         type: 'codelist'
       });
     }
-
 
     var svgLegend = svg.append("g")
       .attr("class", "legend")
@@ -170,53 +169,43 @@ d3.json('dsdims', function (dsdims) {
       .data(links)
       .enter().append("line");
 
-    var svgDimensions = svg.append("g")
-      .attr("class", "dimensions")
-      .selectAll("text")
-      .data(nodes.filter(function (n, i) {
-        return n.type !== 'dataset';
-      }))
-      .enter().append("text")
-      .attr("class", function (n) {
-        return n.type;
-      })
-      .text(function (n) {
-        return n.label;
-      });
-
-    var wrap = d3.textwrap()
-      .bounds({height: 40, width: 80})
-      .method('tspans');
-    d3.selectAll('.dimensions text').call(wrap);
-
     var svgNodes = svg.append("g")
       .attr("class", "nodes")
-      .selectAll("circle")
-      .data(nodes.filter(function (n, i) {
-        return n.type === 'dataset';
-      }))
-      .enter().append("circle")
-      .attr("r", 20)
-      .attr("fill", function (n) {
-        return color(n.context);
-      })
-      .on("mouseover", function (d) {
-        tooltip.transition()
-          .duration(200)
-          .style("opacity", .9);
-        tooltip.html(d.name)
-          .style("left", (d3.event.pageX) + "px")
-          .style("top", (d3.event.pageY - 28) + "px");
-      })
-      .on("mouseout", function (d) {
-        tooltip.transition()
-          .duration(500)
-          .style("opacity", 0);
-      })
+      .selectAll("g")
+      .data(nodes)
+      .enter().append("g")
       .call(d3.drag()
         .on("start", dragstarted)
         .on("drag", dragged)
         .on("end", dragended));
+
+    // dimensions and codelists
+    svgNodes.append("rect")
+      .attr("x", -50)
+      .attr("y", -20)
+      .attr("width", 100)
+      .attr("height", 80)
+      .attr("rx", 10)
+      .attr("ry", 10)
+      .attr("fill", function (n) {
+        if (n.type === "dataset") {
+          return color(n.context);
+        } else {
+          return 'white';
+        }
+      })
+      .attr("stroke", "#555555");
+
+    var svgLabels = svgNodes.append("text")
+      .text(function(d) {return d.label;})
+      .attr("class", function (n) {
+        return n.type;
+      })
+      .attr("x", -4)
+      .attr("y", 0.5)
+      .call(d3.textwrap()
+        .bounds({height: 40, width: 80})
+        .method('tspans'));
 
     simulation
       .nodes(nodes)
@@ -228,34 +217,12 @@ d3.json('dsdims', function (dsdims) {
 
     function ticked() {
       svgLinks
-        .attr("x1", function (d) {
-          return d.source.x;
-        })
-        .attr("y1", function (d) {
-          return d.source.y;
-        })
-        .attr("x2", function (d) {
-          return d.target.x;
-        })
-        .attr("y2", function (d) {
-          return d.target.y;
-        });
-
+        .attr("x1", function (d) { return d.source.x; })
+        .attr("y1", function (d) { return d.source.y; })
+        .attr("x2", function (d) { return d.target.x; })
+        .attr("y2", function (d) { return d.target.y; });
       svgNodes
-        .attr("cx", function (d) {
-          return d.x = Math.max(radius, Math.min(width - radius, d.x))
-        })
-        .attr("cy", function (d) {
-          return d.y = Math.max(radius, Math.min(height - radius, d.y));
-        });
-
-      svgDimensions
-        .attr("x", function (d) {
-          return d.x = Math.max(radius, Math.min(width - radius, d.x))
-        })
-        .attr("y", function (d) {
-          return d.y = Math.max(radius, Math.min(height - radius, d.y));
-        });
+        .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"})
     }
   });
 });
@@ -287,4 +254,4 @@ function downloadSVG() {
     .node().parentNode.innerHTML;
   var blob = new Blob([svg], {type: "image/svg+xml"});
   saveAs(blob, "ons-solar-system.svg");
-};
+}
