@@ -1,0 +1,32 @@
+Solar System of Stastistics
+Copyright 2017 Office for National Statistics
+
+This product includes software developed at the UK Office for National
+Statistics (https://www.ons.gov.uk/)
+
+This product includes 3rd party software with the following licenses:
+Apache 2.0, BSD 3-clause, MIT.
+
+async                  http://caolan.github.io/async/                    MIT
+basic-auth             https://github.com/jshttp/basic-auth              MIT
+body-parser            https://github.com/expressjs/body-parser          MIT
+bootstrap              https://github.com/twbs/bootstrap                 MIT
+collections            https://github.com/montagejs/collections          BSD 3-clause
+cookie-parser          https://github.com/expressjs/cookie-parser        MIT
+d2rq                   http://d2rq.org/                                  Apache 2.0
+d3                     https://github.com/d3/d3                          BSD 3-clause
+d3-textwrap            https://github.com/vijithassar/d3-textwrap        MIT
+debug                  https://github.com/visionmedia/debug              MIT
+express                https://github.com/expressjs/express              MIT
+file-saver             https://github.com/eligrey/FileSaver.js           MIT
+hjs                    https://github.com/nullfirm/hjs                   Apache 2.0
+http-proxy-middleware  https://github.com/chimurai/http-proxy-middleware MIT
+moment                 http://momentjs.com/                              MIT
+morgan                 https://github.com/expressjs/morgan               MIT
+node.js                https://nodejs.org/                               MIT
+serve-favicon          https://github.com/expressjs/serve-favicon        MIT
+sparql                 https://www.npmjs.com/package/sparql              Not declared
+
+This product uses MariaDB licensed as GPLv2 in a separate Docker
+container and accessed using the GPLv2 MySQL Java connector library
+bundled with D2RQ.
