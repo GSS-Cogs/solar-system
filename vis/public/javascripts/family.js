@@ -76,7 +76,7 @@ var simulation = d3.forceSimulation()
   .force("link", d3.forceLink().id(function (d) {
     return d.id;
   }).distance(300))
-  .force("charge", d3.forceManyBody().strength(-2000))
+  .force("charge", d3.forceManyBody().strength(-1000))
   .force("collide", d3.forceCollide(60))
   .force("center", d3.forceCenter(width / 2, height / 2));
 
@@ -222,7 +222,8 @@ d3.json('dsdims', function (dsdims) {
         .attr("x2", function (d) { return d.target.x; })
         .attr("y2", function (d) { return d.target.y; });
       svgNodes
-        .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"})
+        .attr("transform", function(d) { return "translate(" + Math.max(50, Math.min(width - 50, d.x))
+          + "," + Math.max(40, Math.min(height - 40, d.y)) + ")"; })
     }
   });
 });
