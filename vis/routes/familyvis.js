@@ -20,8 +20,9 @@ var sparql = require('sparql');
 var fs = require('fs');
 var path = require('path');
 
-dsDimsQuery = fs.readFileSync(path.resolve(__dirname, 'queries/dataset-dimensions.sparql')).toString();
-dsCodesQuery = fs.readFileSync(path.resolve(__dirname, 'queries/dataset-codelist.sparql')).toString();
+var backupCodelists = require('./temp/codelists.json');
+var dsDimsQuery = fs.readFileSync(path.resolve(__dirname, 'queries/dataset-dimensions.sparql')).toString();
+var dsCodesQuery = fs.readFileSync(path.resolve(__dirname, 'queries/dataset-codelist.sparql')).toString();
 
 router.get('/', function(req, res, next) {
   if (req.originalUrl.slice(-1) != '/') {
@@ -60,7 +61,8 @@ router.get('/dscodes', function(req, res, next) {
   var client = new sparql.Client('https://production-drafter-ons-alpha.publishmydata.com/v1/sparql/live');
   client.rows(dsCodesQuery, function(error, rows) {
     if (error) {
-      res.render('error', {message: 'Error running SPARQL', error: error[1]});
+//      res.render('error', {message: 'Error running SPARQL', error: error[1]});
+      res.json(backupCodelists);
     } else {
       var datasets = {};
       var codelists = {};
