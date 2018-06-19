@@ -57,26 +57,26 @@ router.get('/dsdims', function(req, res, next) {
   });
 });
 
-router.get('/dscodes', function(req, res, next) {
+router.get('/dimcodes', function(req, res, next) {
   var client = new sparql.Client('https://production-drafter-ons-alpha.publishmydata.com/v1/sparql/live');
   client.rows(dsCodesQuery, function(error, rows) {
     if (error) {
 //      res.render('error', {message: 'Error running SPARQL', error: error[1]});
       res.json(backupCodelists);
     } else {
-      var datasets = {};
+      var dimensions = {};
       var codelists = {};
       rows.forEach(function(row) {
-        if (!datasets.hasOwnProperty(row.dataset.value)) {
-          datasets[row.dataset.value] = {
+        if (!dimensions.hasOwnProperty(row.dimension.value)) {
+          dimensions[row.dimension.value] = {
             codelists: [row.codelist.value]
           };
         } else {
-          datasets[row.dataset.value].codelists.push(row.codelist.value);
+          dimensions[row.dimension.value].codelists.push(row.codelist.value);
         }
         codelists[row.codelist.value] = row.codelistlabel.value;
       });
-      res.json({datasets: datasets, codelists: codelists});
+      res.json({dimensions: dimensions, codelists: codelists});
     }
   });
 });

@@ -75,7 +75,7 @@ forceManyBodySubset.initialize = function (nodes) {
 var simulation = d3.forceSimulation()
   .force("link", d3.forceLink().id(function (d) {
     return d.id;
-  }).distance(300))
+  }).distance(50))
   .force("charge", d3.forceManyBody().strength(-1000))
   .force("collide", d3.forceCollide(60))
   .force("center", d3.forceCenter(width / 2, height / 2));
@@ -115,18 +115,18 @@ d3.json('dsdims', function (dsdims) {
     });
   }
 
-  d3.json('dscodes', function (dscodes) {
-    for (dataset in dscodes.datasets) {
-      dscodes.datasets[dataset].codelists.forEach(function (codelist) {
+  d3.json('dimcodes', function (dimcodes) {
+    for (dimension in dimcodes.dimensions) {
+      dimcodes.dimensions[dimension].codelists.forEach(function (codelist) {
         links.push({
-          source: dataset, target: codelist
+          source: dimension, target: codelist
         });
       });
     }
-    for (codelist in dscodes.codelists) {
+    for (codelist in dimcodes.codelists) {
       nodes.push({
         id: codelist,
-        label: dscodes.codelists[codelist],
+        label: dimcodes.codelists[codelist],
         type: 'codelist'
       });
     }

@@ -7,4 +7,5 @@ WHERE {
        rdfs:label ?datalabel;
        qb:structure/qb:component/qb:dimension ?dimension .
   ?dimension rdfs:label ?dimlabel .
+  FILTER (?dimension NOT IN (qb:measureType) )
 }
