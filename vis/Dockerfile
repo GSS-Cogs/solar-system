@@ -1,12 +1,14 @@
-FROM alpine:3.4
+FROM node:10-alpine AS base
 MAINTAINER Alex Tucker <alex@floop.org.uk>
 
 WORKDIR /app
 COPY package.json ./
-RUN apk add --no-cache nodejs && \
-  npm install -g && \
-  npm cache clean
-ENV NODE_PATH=/usr/lib/node_modules/vis/node_modules
+RUN npm install
+
+FROM node:10-alpine AS release
+COPY --from=base /app/node_modules /app/node_modules
+COPY --from=base /app/package-lock.json /app/
 EXPOSE 3000
+WORKDIR /app
 COPY . /app/
 CMD npm start
