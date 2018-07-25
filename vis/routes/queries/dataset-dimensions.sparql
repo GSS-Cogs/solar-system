@@ -1,11 +1,15 @@
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX gss: <http://gss-data.org.uk/def/gss#>
 
-SELECT DISTINCT ?dataset ?datalabel ?dimension ?dimlabel
+SELECT DISTINCT ?dataset ?datalabel ?dimension ?dimlabel ?family
 WHERE {
   ?dataset a qb:DataSet;
        rdfs:label ?datalabel;
        qb:structure/qb:component/qb:dimension ?dimension .
   ?dimension rdfs:label ?dimlabel .
+  OPTIONAL {
+    ?dataset gss:family ?family
+  }
   FILTER (?dimension NOT IN (qb:measureType) )
 }

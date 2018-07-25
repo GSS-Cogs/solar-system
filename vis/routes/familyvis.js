@@ -42,10 +42,14 @@ router.get('/dsdims', function(req, res, next) {
       var dimensions = {};
       rows.forEach(function(row) {
         if (!datasets.hasOwnProperty(row.dataset.value)) {
+          var family = 'http://gss-data.org.uk/def/gss#trade';
+          if (row.hasOwnProperty('family')) {
+            family = row.family.value;
+          }
           datasets[row.dataset.value] = {
             label: row.datalabel.value,
             dimensions: [row.dimension.value],
-            family: 'Trade'
+            family: family
           };
         } else {
           datasets[row.dataset.value].dimensions.push(row.dimension.value);
