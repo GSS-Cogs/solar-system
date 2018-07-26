@@ -160,13 +160,7 @@ d3.json('dsdims', function (dsdims) {
         return 40 + i * 15;
       })
       .text(function (d) {
-        var hash = d.id.lastIndexOf('#')
-        if (hash == -1) {
-          return d.id;
-        } else {
-          var lab = d.id.substring(hash + 1);
-          return lab.charAt(0).toUpperCase() + lab.substring(1);
-        }
+        return d.id;
       });
 
     var svgLinks = svg.append("g")

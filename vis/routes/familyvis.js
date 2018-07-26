@@ -42,7 +42,7 @@ router.get('/dsdims', function(req, res, next) {
       var dimensions = {};
       rows.forEach(function(row) {
         if (!datasets.hasOwnProperty(row.dataset.value)) {
-          var family = 'http://gss-data.org.uk/def/gss#trade';
+          var family = 'Trade';
           if (row.hasOwnProperty('family')) {
             family = row.family.value;
           }
