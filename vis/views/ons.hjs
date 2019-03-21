@@ -9,13 +9,13 @@
     <link href="/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
     <link href="/stylesheets/bscustom.css" rel="stylesheet">
     <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+      <script src="/lib/html5shiv.min.js"></script>
+      <script src="/lib/respond.min.js"></script>
     <![endif]-->
-    <script src="https://d3js.org/d3.v4.min.js"></script>
-    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
-    <script src="/d3-textwrap/d3-textwrap.js"></script>
-    <script src="/file-saver/FileSaver.min.js"></script>
+    <script src="/lib/d3.min.js"></script>
+    <script src="/lib/d3-scale-chromatic.min.js"></script>
+    <script src="/lib/d3-textwrap.js"></script>
+    <script src="/lib/FileSaver.min.js"></script>
     <link rel="stylesheet" href="/stylesheets/fdp.css">
   </head>
   <body>
@@ -46,7 +46,7 @@
     <div class="container">
       <div id="chart"></div>
     </div>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="/lib/jquery.min.js"></script>
     <script src="/bootstrap/js/bootstrap.min.js"></script>
     <script src="/javascripts/fdp.js"></script>
   </body>

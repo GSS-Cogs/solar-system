@@ -63,14 +63,22 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.set('strict routing', true);
 
 // make client side JS libraries available
-app.use('/d3',
+app.use('/lib',
         express.static(path.resolve(require.resolve('d3'), '..')));
-app.use('/d3-textwrap',
+app.use('/lib',
+  express.static(path.resolve(require.resolve('d3-scale-chromatic'), '..')));
+app.use('/lib',
         express.static(path.resolve(require.resolve('d3-textwrap'), '..')));
 app.use('/bootstrap',
         express.static(path.resolve(require.resolve('bootstrap'), '../..')));
-app.use('/file-saver',
+app.use('/lib',
         express.static(path.resolve(require.resolve('file-saver'), '..')));
+app.use('/lib',
+  express.static(path.resolve(require.resolve('respond.js/dest/respond.src.js'), '..')));
+app.use('/lib',
+  express.static(path.resolve(require.resolve('html5shiv'), '..')));
+app.use('/lib',
+  express.static(path.resolve(require.resolve('jquery'), '..')));
 
 app.get('/topics', function(req, res) {
   res.redirect(301, '/gss/');
