@@ -69,6 +69,10 @@ app.use('/lib',
   express.static(path.resolve(require.resolve('d3-scale-chromatic'), '..')));
 app.use('/lib',
         express.static(path.resolve(require.resolve('d3-textwrap'), '..')));
+app.use('/lib',
+  express.static(path.resolve(require.resolve('d3plus-common'), '..')));
+app.use('/lib',
+  express.static(path.resolve(require.resolve('d3plus-text'), '..')));
 app.use('/bootstrap',
         express.static(path.resolve(require.resolve('bootstrap'), '../..')));
 app.use('/lib',
