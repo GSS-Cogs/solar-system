@@ -81,7 +81,7 @@ var simulation = d3.forceSimulation()
     return d.id;
   }))
   .force("charge", d3.forceManyBody().strength(-100))
-  .force("collide", d3.forceCollide(20))
+  .force("collide", d3.forceCollide(30))
   .force("center", d3.forceCenter(width / 2, height / 2));
 
 var tooltip = d3.select("body").append("div")
@@ -189,17 +189,17 @@ d3.json('dsdims').then(function (dsdims) {
 
     var svgConceptNodes = svgAllNodes.filter(function(n) { return n.type == 'codelist'; })
       .append("rect")
-      .attr("class", "concept").attr("x", -25).attr("y", -10)
-      .attr("width", 60).attr("height", 14)
+      .attr("class", "concept").attr("x", -30).attr("y", -16)
+      .attr("width", 60).attr("height", 32)
       .attr("fill", "#ffffdd")
       .attr("stroke", "#555555")
       .each(function(n) {
         new d3plus.TextBox()
           .data([{
             "text": n.label,
-            "height": 12,
+            "height": 28,
             "width": 58,
-            "x": -29, "y": -6,
+            "x": -28, "y": -14,
             "id": "concept" + n.elementId
           }])
           .select("#" + n.elementId)
@@ -233,7 +233,7 @@ d3.json('dsdims').then(function (dsdims) {
       .append("ellipse")
       .attr("class", "dimension").attr("x", -25).attr("y", -10)
       .attr("cx", 0).attr("cy", 0).attr("rx", 30).attr("ry", 15)
-      .attr("fill", "white")
+      .attr("fill", "#ddffff")
       .attr("stroke", "#555555")
       .each(function (n) {
         new d3plus.TextBox()
