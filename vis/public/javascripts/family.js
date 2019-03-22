@@ -34,8 +34,12 @@ var svgCss = ".links line {\
   fill-opacity: 0.5;\
 }\
 \
-.dimension {\
-  fill: #bada55;\
+text.dataset {\
+  font-size: small;\
+}\
+text.dimension {\
+  color: #bada55;\
+  font-size: smaller;\
 }\
 \
 .codelist {\
@@ -75,9 +79,9 @@ forceManyBodySubset.initialize = function (nodes) {
 var simulation = d3.forceSimulation()
   .force("link", d3.forceLink().id(function (d) {
     return d.id;
-  }).distance(50))
-  .force("charge", d3.forceManyBody().strength(-1000))
-  .force("collide", d3.forceCollide(60))
+  }))
+  .force("charge", d3.forceManyBody().strength(-100))
+  .force("collide", d3.forceCollide(20))
   .force("center", d3.forceCenter(width / 2, height / 2));
 
 var tooltip = d3.select("body").append("div")
@@ -88,20 +92,23 @@ var nodes = [];
 var links = [];
 var dimensions = d3.set();
 var contexts = d3.set();
+var elementId = 1;
 
-d3.json('dsdims', function (dsdims) {
+d3.json('dsdims').then(function (dsdims) {
   for (dataset in dsdims.datasets) {
     nodes.push({
       id: dataset,
       label: dsdims.datasets[dataset].label,
       context: dsdims.datasets[dataset].family,
-      type: 'dataset'
+      type: 'dataset',
+      elementId: 'node' + elementId++
     });
     dsdims.datasets[dataset].dimensions.forEach(function (dimension) {
       dimensions.add(dimension);
       links.push({
         source: dataset,
-        target: dimension
+        target: dimension,
+        distance: 150
       });
     });
     contexts.add(dsdims.datasets[dataset].family);
@@ -111,15 +118,16 @@ d3.json('dsdims', function (dsdims) {
     nodes.push({
       id: dimension,
       label: dsdims.dimensions[dimension],
-      type: 'dimension'
+      type: 'dimension',
+      elementId: 'node' + elementId++
     });
   }
 
-  d3.json('dimcodes', function (dimcodes) {
+  d3.json('dimcodes').then(function (dimcodes) {
     for (dimension in dimcodes.dimensions) {
       dimcodes.dimensions[dimension].codelists.forEach(function (codelist) {
         links.push({
-          source: dimension, target: codelist
+          source: dimension, target: codelist, distance: 30
         });
       });
     }
@@ -127,7 +135,8 @@ d3.json('dsdims', function (dsdims) {
       nodes.push({
         id: codelist,
         label: dimcodes.codelists[codelist],
-        type: 'codelist'
+        type: 'codelist',
+        elementId: 'node' + elementId++
       });
     }
 
@@ -152,7 +161,6 @@ d3.json('dsdims', function (dsdims) {
       .attr("fill", function (d) {
         return color(d.id);
       });
-    //      .attr("stroke", function(d) { return color(d.id).darker(0.3); })
 
     svgLegend.append('text')
       .attr('x', 30)
@@ -169,43 +177,78 @@ d3.json('dsdims', function (dsdims) {
       .data(links)
       .enter().append("line");
 
-    var svgNodes = svg.append("g")
+    var svgAllNodes = svg.append("g")
       .attr("class", "nodes")
       .selectAll("g")
       .data(nodes)
-      .enter().append("g")
+      .enter().append("g").attr("id", function(n) {return n.elementId;})
       .call(d3.drag()
         .on("start", dragstarted)
         .on("drag", dragged)
         .on("end", dragended));
 
-    // dimensions and codelists
-    svgNodes.append("rect")
-      .attr("x", -50)
-      .attr("y", -20)
-      .attr("width", 100)
-      .attr("height", 80)
-      .attr("rx", 10)
-      .attr("ry", 10)
-      .attr("fill", function (n) {
-        if (n.type === "dataset") {
-          return color(n.context);
-        } else {
-          return 'white';
-        }
-      })
-      .attr("stroke", "#555555");
+    var svgConceptNodes = svgAllNodes.filter(function(n) { return n.type == 'codelist'; })
+      .append("rect")
+      .attr("class", "concept").attr("x", -25).attr("y", -10)
+      .attr("width", 60).attr("height", 14)
+      .attr("fill", "#ffffdd")
+      .attr("stroke", "#555555")
+      .each(function(n) {
+        new d3plus.TextBox()
+          .data([{
+            "text": n.label,
+            "height": 12,
+            "width": 58,
+            "x": -29, "y": -6,
+            "id": "concept" + n.elementId
+          }])
+          .select("#" + n.elementId)
+          .verticalAlign("middle")
+          .textAnchor("middle")
+          .render()
+      });
 
-    var svgLabels = svgNodes.append("text")
-      .text(function(d) {return d.label;})
-      .attr("class", function (n) {
-        return n.type;
-      })
-      .attr("x", -4)
-      .attr("y", 0.5)
-      .call(d3.textwrap()
-        .bounds({height: 40, width: 80})
-        .method('tspans'));
+    var svgDatasetNodes = svgAllNodes.filter(function(n) { return n.type == 'dataset'; })
+      .append("rect")
+      .attr("class", "dataset").attr("x", -50).attr("y", -20)
+      .attr("width", 100).attr("height", 40).attr("rx", 10).attr("ry", 10)
+      .attr("fill", function (n) { return color(n.context); })
+      .attr("stroke", "#555555")
+      .each(function(n) {
+        new d3plus.TextBox()
+          .data([{
+            "text": n.label,
+            "height": 36,
+            "width": 80,
+            "x": -40, "y": -18,
+            "id": "dataset" + n.elementId
+          }])
+          .select("#" + n.elementId)
+          .verticalAlign("middle")
+          .textAnchor("middle")
+          .render()
+      });
+
+    var svgDimensionNodes = svgAllNodes.filter(function(n) { return n.type == 'dimension'; })
+      .append("ellipse")
+      .attr("class", "dimension").attr("x", -25).attr("y", -10)
+      .attr("cx", 0).attr("cy", 0).attr("rx", 30).attr("ry", 15)
+      .attr("fill", "white")
+      .attr("stroke", "#555555")
+      .each(function (n) {
+        new d3plus.TextBox()
+          .data([{
+            "text": n.label,
+            "height": 28,
+            "width": 58,
+            "x": -29, "y": -14,
+            "id": "dimension" + n.elementId
+          }])
+          .select("#" + n.elementId)
+          .verticalAlign("middle")
+          .textAnchor("middle")
+          .render()
+      });
 
     simulation
       .nodes(nodes)
@@ -213,6 +256,7 @@ d3.json('dsdims', function (dsdims) {
 
     simulation
       .force("link")
+      .distance(function(d){return d.distance;})
       .links(links);
 
     function ticked() {
@@ -221,7 +265,7 @@ d3.json('dsdims', function (dsdims) {
         .attr("y1", function (d) { return d.source.y; })
         .attr("x2", function (d) { return d.target.x; })
         .attr("y2", function (d) { return d.target.y; });
-      svgNodes
+      svgAllNodes
         .attr("transform", function(d) { return "translate(" + Math.max(50, Math.min(width - 50, d.x))
           + "," + Math.max(40, Math.min(height - 40, d.y)) + ")"; })
     }
