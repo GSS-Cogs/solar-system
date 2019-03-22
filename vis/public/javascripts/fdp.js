@@ -79,7 +79,7 @@ var links = [];
 var topics = d3.set();
 var contexts = d3.set();
 
-d3.json('datasets', function(datasets) {
+d3.json('datasets').then(function(datasets) {
   for (dataset in datasets) {
     nodes.push({
       id: dataset,
@@ -97,7 +97,7 @@ d3.json('datasets', function(datasets) {
     contexts.add(datasets[dataset].context);
   }
 
-  d3.json('labels', function(labels) {
+  d3.json('labels').then( function(labels) {
     topics.each(function(topic) {
       nodes.push({
         id: topic,
