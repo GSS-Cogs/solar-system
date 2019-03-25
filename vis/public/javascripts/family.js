@@ -18,39 +18,14 @@ var chart = document.getElementById("chart");
 var svg = d3.select(chart).append("svg");
 var radius = 20;
 
-var svgCss = ".links line {\
-  stroke: #999;\
-  stroke-opacity: 0.5;\
-}\
-\
-.nodes circle {\
-  stroke: #fff;\
-  stroke-width: 1.5px;\
-}\
-\
-.topics text {\
-  color: #999;\
-  font-size: x-small;\
-  fill-opacity: 0.5;\
-}\
-\
-text.dataset {\
-  font-size: small;\
-}\
-text.dimension {\
-  color: #bada55;\
-  font-size: smaller;\
-}\
-\
-.codelist {\
-  fill: #5555da;\
-}\
-";
-
-svg.attr("title", "Solar System")
+var svgDoc = svg.attr("title", "Solar System")
   .attr("version", 1.1)
-  .attr("xmlns", "http://www.w3.org/2000/svg")
-  .append("style").text(svgCss);
+  .attr("xmlns", "http://www.w3.org/2000/svg");
+
+d3.text("/stylesheets/family.css").then(function(svgCss) {
+  svgDoc
+    .append("style").text(svgCss);
+});
 
 var width, height;
 
@@ -156,8 +131,9 @@ d3.json('dsdims').then(function (dsdims) {
       .attr('y', function (d, i) {
         return 30 + i * 15;
       })
-      .attr('height', 12)
-      .attr('width', 12)
+      .attr('height', 10)
+      .attr('width', 14)
+      .attr("rx", 2).attr("ry", 2)
       .attr("fill", function (d) {
         return color(d.id);
       });
@@ -170,6 +146,23 @@ d3.json('dsdims').then(function (dsdims) {
       .text(function (d) {
         return d.id;
       });
+
+    var svgDimensionLegend = svg.selectAll('.legend')
+      .append('g').attr('class', 'category')
+    svgDimensionLegend
+      .append('ellipse').attr('class', 'dimension')
+      .attr('cx', 17).attr('cy', 40 + contexts.size() * 15).attr('rx', 7).attr('ry', 5)
+    svgDimensionLegend
+      .append('text').attr('x', 30).attr('y', 45 + contexts.size() * 15).text('Dimension')
+
+    var svgConceptLegend = svg.selectAll('.legend')
+      .append('g').attr('class', 'category')
+    svgConceptLegend
+      .append('rect').attr('class', 'concept')
+      .attr('x', 10).attr('y', 50 + contexts.size() * 15)
+      .attr('width', 14).attr('height', 10)
+    svgConceptLegend
+      .append('text').attr('x', 30).attr('y', 60 + contexts.size() * 15).text('Codelist')
 
     var svgLinks = svg.append("g")
       .attr("class", "links")

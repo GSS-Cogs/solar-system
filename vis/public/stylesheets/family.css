@@ -1,0 +1,34 @@
+.links line {
+    stroke: #999;
+    stroke-opacity: 0.5;
+}
+
+.nodes circle {
+    stroke: #fff;
+    stroke-width: 1.5px;
+}
+
+.topics text {
+    color: #999;
+    font-size: x-small;
+    fill-opacity: 0.5;
+}
+
+text.dataset {
+    font-size: small;
+}
+text.dimension {
+    color: #bada55;
+    font-size: smaller;
+}
+
+.codelist {
+    fill: #5555da;
+}
+.legend .dimension {
+    fill: #aaffff;
+}
+
+.legend .concept {
+    fill: #ffffaa;
+}
