@@ -1,0 +1,6 @@
+SQLObject
+mysqlclient
+rdflib
+CacheControl[filecache]
+requests
+SPARQLWrapper
