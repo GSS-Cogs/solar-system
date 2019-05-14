@@ -4,3 +4,4 @@ rdflib
 CacheControl[filecache]
 requests
 SPARQLWrapper
+python-dateutil

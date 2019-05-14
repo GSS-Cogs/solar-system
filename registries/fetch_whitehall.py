@@ -145,6 +145,8 @@ while still_going:
                 publication_date=issued,
                 government_name=res['government_name']
             )
+            for org in publishers:
+                ds.addOrganisation(org)
 
     if fresh_datasets and 'next_page_url' in datasets:
         datasets_url = urljoin(datasets_url, datasets['next_page_url'])
