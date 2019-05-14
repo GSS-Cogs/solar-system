@@ -1,4 +1,4 @@
-version: '2'
+version: '3.7'
 
 services:
 
@@ -18,7 +18,8 @@ services:
       - default
 
   sqldb:
-    image: mariadb:10
+    build:
+      context: sqldb
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD=yes
       - MYSQL_DATABASE=solarsystem
