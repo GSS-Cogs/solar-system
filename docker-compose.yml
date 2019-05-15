@@ -8,6 +8,7 @@ services:
     links:
       - d2r
       - loadsheets
+      - stats-registry
     environment:
       - VIRTUAL_HOST=ons.floop.org.uk
       - LETSENCRYPT_HOST=ons.floop.org.uk
