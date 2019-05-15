@@ -118,8 +118,7 @@ while still_going:
         landingPage = urljoin(datasets_url, res['url'])
         try:
             ds = Dataset.byUrl(landingPage)
-            publication_date = ds.publication_date.astimezone(timezone.utc)
-            if publication_date != issued or set(publishers) != set(ds.orgs):
+            if ds.publication_date != issued.replace(tzinfo=None) or set(publishers) != set(ds.orgs):
                 fresh_datasets = True
                 ds.set(
                     whitehall_id=res['id'],

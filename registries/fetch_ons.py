@@ -111,7 +111,7 @@ while still_going:
             contacts.append(contact)
         try:
             ds = Dataset.byUri(ds_uri)
-            if ds.release_date != release_date:
+            if ds.release_date != release_date.replace(tzinfo=None):
                 fresh_datasets = True
                 ds.set(
                     uri=ds_uri,
