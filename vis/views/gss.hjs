@@ -51,7 +51,6 @@
             <li><a href="/family/">Families</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-            <li><a href="#" id="refresh" role="button">Refresh <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></a></li>
             <li><a href="#" id="generate" role="button">Download SVG <span class="glyphicon glyphicon-download" aria-hidden="true"></span></a></li>
           </ul>
         </div>
