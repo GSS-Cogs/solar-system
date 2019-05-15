@@ -5,3 +5,5 @@ CacheControl[filecache]
 requests
 SPARQLWrapper
 python-dateutil
+gspread
+oauth2client
