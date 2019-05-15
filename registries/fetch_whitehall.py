@@ -108,7 +108,10 @@ while still_going:
         orgs_list = res['organisations']
 
         for label, uri in orgs.items():
-            if orgs_list.endswith(label) or f'title"{label}"' in orgs_list or f'{label} and ' in orgs_list:
+            if orgs_list.endswith(label) or \
+                    f'title="{label}"' in orgs_list or \
+                    f'{label} and ' in orgs_list or \
+                    f'{label}, ' in orgs_list:
                 publishers.append(Organisation.byUri(uri))
         issued = datetime.fromisoformat(res['public_timestamp']).astimezone(timezone.utc)
         if 'publication_collections' in res and res['publication_collections'] is not None:
