@@ -7,7 +7,6 @@ services:
       context: vis
     links:
       - d2r
-      - loadsheets
       - stats-registry
     environment:
       - VIRTUAL_HOST=ons.floop.org.uk
@@ -23,13 +22,12 @@ services:
       context: sqldb
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD=yes
-      - MYSQL_DATABASE=solarsystem
+      - MYSQL_DATABASE=sheet
       - MYSQL_USER=solar
       - MYSQL_PASSWORD=system
     volumes:
       - mariadb:/var/lib/mysql:z
     restart: always
-    command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci --init-connect='SET NAMES UTF8;' --innodb-flush-log-at-trx-commit=0
 
   d2r:
     image: cloudfluff/d2r
@@ -41,22 +39,15 @@ services:
       - sqldb
     restart: always
 
-  loadsheets:
-    build:
-      context: sheets
-    volumes:
-      - solardata:/data:z
-    links:
-      - sqldb
-    restart: always
-
   stats-registry:
     build:
       context: registries
     volumes:
       - registry:/registry:z
+      - solardata:/data:z
     links:
       - sqldb
+    restart: always
 
 volumes:
   mariadb:
