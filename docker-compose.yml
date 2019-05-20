@@ -22,7 +22,7 @@ services:
       context: sqldb
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD=yes
-      - MYSQL_DATABASE=sheet
+      - MYSQL_DATABASE=stats
       - MYSQL_USER=solar
       - MYSQL_PASSWORD=system
     volumes:
