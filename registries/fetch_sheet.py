@@ -24,12 +24,16 @@ from sqlobject import *
 
 
 class Organisation(SQLObject):
+    class sqlmeta:
+        table = 'sh_organisation'
     sheetName = UnicodeCol()
     longName = UnicodeCol(default=None)
     link = UnicodeCol()
 
 
 class Dataset(SQLObject):
+    class sqlmeta:
+        table = 'sh_dataset'
     organisation = ForeignKey('Organisation', cascade=True)
     title = UnicodeCol()
     frequency = EnumCol(enumValues=['5Y', '4Y', '3Y', '2Y', 'Y', 'Q', 'M', 'W', '2W', '2', '6', 'AH'])
@@ -40,6 +44,8 @@ class Dataset(SQLObject):
 
 
 class Stats(SQLObject):
+    class sqlmeta:
+        table = 'sh_stats'
     name = UnicodeCol()
     geography = UnicodeCol()
     time = UnicodeCol()
@@ -52,6 +58,8 @@ class Stats(SQLObject):
 
 
 class Topic(SQLObject):
+    class sqlmeta:
+        table = 'sh_topic'
     label = UnicodeCol()
 
 
@@ -64,25 +72,25 @@ def refresh(log):
     gc = gspread.authorize(credentials)
     sh = gc.open_by_key('1Fiu5q-si5PUvh7ulWwHkQnUoREgYliywZOd7HOftPsU')
 
-    connection = connectionForURI('mysql://solar:system@sqldb/sheet?charset=utf8')
+    connection = connectionForURI('mysql://solar:system@sqldb/stats?charset=utf8')
     sqlhub.processConnection = connection
 
     Organisation.createTable(ifNotExists=True)
     Organisation.deleteMany(None)
-    connection.query("ALTER TABLE organisation AUTO_INCREMENT=1")
+    connection.query("ALTER TABLE sh_organisation AUTO_INCREMENT=1")
 
     Dataset.createTable(ifNotExists=True)
     Dataset.deleteMany(None)
-    connection.query("ALTER TABLE dataset AUTO_INCREMENT=1")
+    connection.query("ALTER TABLE sh_dataset AUTO_INCREMENT=1")
 
     Organisation.sqlmeta.addJoin(MultipleJoin('Dataset', joinMethodName='datasets'))
 
     Stats.createTable(ifNotExists=True)
     Stats.deleteMany(None)
-    connection.query("ALTER TABLE stats AUTO_INCREMENT=1")
+    connection.query("ALTER TABLE sh_stats AUTO_INCREMENT=1")
     Topic.createTable(ifNotExists=True)
     Topic.deleteMany(None)
-    connection.query("ALTER TABLE topic AUTO_INCREMENT=1")
+    connection.query("ALTER TABLE sh_topic AUTO_INCREMENT=1")
 
     Dataset.sqlmeta.addJoin(MultipleJoin('Stats', joinMethodName='stats'))
 

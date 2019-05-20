@@ -11,11 +11,13 @@ from requests import Session
 from sqlobject import connectionForURI, sqlhub, SQLObject, BoolCol, StringCol, DateTimeCol, SQLObjectNotFound, \
     RelatedJoin, DateCol
 
-connection = connectionForURI('mysql://solar:system@sqldb/ons?charset=utf8')
+connection = connectionForURI('mysql://solar:system@sqldb/stats?charset=utf8')
 sqlhub.processConnection = connection
 
 
 class Dataset(SQLObject):
+    class sqlmeta:
+        table = 'ons_dataset'
     uri = StringCol(alternateID=True, length=511)
     national_statistic = BoolCol()
     title = StringCol()
@@ -29,10 +31,14 @@ class Dataset(SQLObject):
 
 
 class Keyword(SQLObject):
+    class sqlmeta:
+        table = 'ons_keyword'
     keyword = StringCol(alternateID=True, length=255)
 
 
 class Contact(SQLObject):
+    class sqlmeta:
+        table = 'ons_contact'
     email = StringCol()
     name = StringCol()
     telephone = StringCol()

@@ -14,7 +14,7 @@ from urllib.parse import urljoin
 from sqlobject import connectionForURI, sqlhub, SQLObject, StringCol, DateTimeCol, IntCol, EnumCol, RelatedJoin, \
     SQLObjectNotFound
 
-connection = connectionForURI('mysql://solar:system@sqldb/whitehall?charset=utf8')
+connection = connectionForURI('mysql://solar:system@sqldb/stats?charset=utf8')
 sqlhub.processConnection = connection
 
 DCAT = Namespace('http://www.w3.org/ns/dcat#')
@@ -36,12 +36,16 @@ gss.close()
 
 
 class Organisation(SQLObject):
+    class sqlmeta:
+        table = 'wh_organisation'
     uri = StringCol(alternateID=True, length=255)
     label = StringCol()
     datasets = RelatedJoin('Dataset')
 
 
 class Dataset(SQLObject):
+    class sqlmeta:
+        table = 'wh_dataset'
     whitehall_id = IntCol(alternateID=True)
     stats_type = EnumCol(enumValues=['Official Statistics', 'National Statistics', 'Statistical data set', None],
                          default=None)
@@ -54,6 +58,8 @@ class Dataset(SQLObject):
 
 
 class Collection(SQLObject):
+    class sqlmeta:
+        table = 'wh_collection'
     uri = StringCol()
     label = StringCol()
     datasets = RelatedJoin('Dataset')
