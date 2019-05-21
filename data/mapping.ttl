@@ -343,51 +343,67 @@ map:ons_dataset__label a d2rq:PropertyBridge;
 	d2rq:property rdfs:label;
 	d2rq:column "ons_dataset.title";
 	.
-map:ons_dataset_national_statistic a d2rq:PropertyBridge;
-	d2rq:belongsToClassMap map:ons_dataset;
-	d2rq:property ons:dataset_national_statistic;
-	d2rq:propertyDefinitionLabel "dataset national_statistic";
-	d2rq:column "ons_dataset.national_statistic";
-	d2rq:datatype xsd:boolean;
-	.
-map:ons_dataset_edition a d2rq:PropertyBridge;
-	d2rq:belongsToClassMap map:ons_dataset;
-	d2rq:property ons:dataset_edition;
-	d2rq:propertyDefinitionLabel "dataset edition";
-	d2rq:column "ons_dataset.edition";
-	.
 map:ons_dataset_summary a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:ons_dataset;
 	d2rq:property ons:dataset_summary;
 	d2rq:propertyDefinitionLabel "dataset summary";
 	d2rq:column "ons_dataset.summary";
 	.
-map:ons_dataset_release_date a d2rq:PropertyBridge;
-	d2rq:belongsToClassMap map:ons_dataset;
-	d2rq:property ons:dataset_release_date;
-	d2rq:propertyDefinitionLabel "dataset release_date";
-	d2rq:column "ons_dataset.release_date";
+
+# Table ons_distribution
+map:ons_distribution a d2rq:ClassMap;
+	d2rq:dataStorage map:database;
+	d2rq:class ons:Distribution;
+	d2rq:classDefinitionLabel "distribution";
+	d2rq:uriPattern "ons_distribution/@@ons_distribution.id@@";
+#	d2rq:uriColumn "ons_dataset.uri";
+        .
+map:ons_distribution_national_statistic a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:ons_distribution;
+	d2rq:property ons:distribution_national_statistic;
+	d2rq:propertyDefinitionLabel "distribution national_statistic";
+	d2rq:column "ons_distribution.national_statistic";
+	d2rq:datatype xsd:boolean;
+	.
+map:ons_distribution_edition a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:ons_distribution;
+	d2rq:property ons:distribution_edition;
+	d2rq:propertyDefinitionLabel "distribution edition";
+	d2rq:column "ons_distribution.edition";
+	.
+map:ons_distribution_release_date a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:ons_distribution;
+	d2rq:property ons:distribution_release_date;
+	d2rq:propertyDefinitionLabel "distribution release_date";
+	d2rq:column "ons_distribution.release_date";
 	d2rq:datatype xsd:dateTime;
 	.
-map:ons_dataset_next_release a d2rq:PropertyBridge;
-	d2rq:belongsToClassMap map:ons_dataset;
-	d2rq:property ons:dataset_next_release;
-	d2rq:propertyDefinitionLabel "dataset next_release";
-	d2rq:column "ons_dataset.next_release";
+map:ons_distribution_next_release a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:ons_distribution;
+	d2rq:property ons:distribution_next_release;
+	d2rq:propertyDefinitionLabel "distribution next_release";
+	d2rq:column "ons_distribution.next_release";
 	d2rq:datatype xsd:date;
 	.
-map:ons_dataset_version a d2rq:PropertyBridge;
-	d2rq:belongsToClassMap map:ons_dataset;
-	d2rq:property ons:dataset_version;
-	d2rq:propertyDefinitionLabel "dataset version";
-	d2rq:column "ons_dataset.version";
+map:ons_distribution_version a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:ons_distribution;
+	d2rq:property ons:distribution_version;
+	d2rq:propertyDefinitionLabel "distribution version";
+	d2rq:column "ons_distribution.version";
 	.
-map:ons_dataset_contact a d2rq:PropertyBridge;
-	d2rq:belongsToClassMap map:ons_dataset;
+map:ons_distribution_contact a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:ons_distribution;
 	d2rq:property wh:has_contact;
 	d2rq:refersToClassMap map:ons_contact;
-	d2rq:join "ons_dataset.id <= ons_contact_ons_dataset.ons_dataset_id";
-	d2rq:join "ons_contact_ons_dataset.ons_contact_id => ons_contact.id";
+	d2rq:join "ons_distribution.id <= ons_contact_ons_distribution.ons_distribution_id";
+	d2rq:join "ons_contact_ons_distribution.ons_contact_id => ons_contact.id";
+	.
+map:ons_dataset_distribution a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap map:ons_dataset;
+	d2rq:property wh:has_distribution;
+	d2rq:refersToClassMap map:ons_distribution;
+	d2rq:join "ons_dataset.id <= ons_dataset_ons_distribution.ons_dataset_id";
+	d2rq:join "ons_dataset_ons_distribution.ons_distribution_id => ons_distribution.id";
 	.
 
 # Table ons_keyword
