@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 import time
 from datetime import datetime, timezone
-from urllib.parse import urljoin
+from pathlib import PosixPath
+from urllib.parse import urljoin, urlparse, urlunparse
 
 from dateutil.parser import parse
 from cachecontrol import CacheControl
@@ -11,7 +12,8 @@ from requests import Session
 from sqlobject import connectionForURI, sqlhub, SQLObject, BoolCol, StringCol, DateTimeCol, SQLObjectNotFound, \
     RelatedJoin, DateCol
 
-connection = connectionForURI('mysql://solar:system@sqldb/stats?charset=utf8')
+#connection = connectionForURI('mysql://solar:system@sqldb/stats?charset=utf8')
+connection = connectionForURI('sqlite:ons')
 sqlhub.processConnection = connection
 
 
@@ -19,14 +21,21 @@ class Dataset(SQLObject):
     class sqlmeta:
         table = 'ons_dataset'
     uri = StringCol(alternateID=True, length=511)
-    national_statistic = BoolCol()
     title = StringCol()
-    edition = StringCol()
     summary = StringCol()
+    keywords = RelatedJoin('Keyword')
+    distributions = RelatedJoin('Distribution')
+
+
+class Distribution(SQLObject):
+    class sqlmeta:
+        table = 'ons_distribution'
+    uri = StringCol()
+    national_statistic = BoolCol()
+    version = StringCol()
+    edition = StringCol()
     release_date = DateTimeCol()
     next_release = DateCol()
-    version = StringCol()
-    keywords = RelatedJoin('Keyword')
     contacts = RelatedJoin('Contact')
 
 
@@ -42,10 +51,11 @@ class Contact(SQLObject):
     email = StringCol()
     name = StringCol()
     telephone = StringCol()
-    datasets = RelatedJoin('Dataset')
+    datasets = RelatedJoin('Distribution')
 
 
 Dataset.createTable(ifNotExists=True)
+Distribution.createTable(ifNotExists=True)
 Keyword.createTable(ifNotExists=True)
 Contact.createTable(ifNotExists=True)
 
@@ -75,12 +85,15 @@ still_going = True
 
 while still_going:
     datasets = fetch_carefully(f'https://api.ons.gov.uk/dataset?start={start}&limit={limit}')
-    fresh_datasets = False
+    fresh_data = False
     for item in datasets['items']:
-        ds_uri = urljoin('https://www.ons.gov.uk', item['uri'])
+        dist_uri = urljoin('https://www.ons.gov.uk', item['uri'])
+        dist_parsed = urlparse(dist_uri)
+        ds_uri = urlunparse(dist_parsed._replace(path = str(PosixPath(dist_parsed.path).parent)))
         desc = item['description']
         national_stats = desc.get('nationalStatistic', False)
-        release_date = datetime.fromisoformat(desc['releaseDate'].replace('Z', '+00:00')).astimezone(timezone.utc)
+        release_date = datetime.fromisoformat(
+            desc['releaseDate'].replace('Z', '+00:00')).astimezone(timezone.utc).replace(tzinfo=None)
         next_release = None
         if 'nextRelease' in desc and desc['nextRelease'] != '':
             try:
@@ -115,48 +128,59 @@ while still_going:
                     telephone=lift_get_strip(desc['contact'], 'telephone')
                 )
             contacts.append(contact)
+        ds = None
         try:
             ds = Dataset.byUri(ds_uri)
-            if ds.release_date != release_date.replace(tzinfo=None):
-                fresh_datasets = True
-                ds.set(
-                    uri=ds_uri,
-                    national_statistic=national_stats,
-                    title=lift_get_strip(desc, 'title'),
-                    edition=lift_get_strip(desc, 'edition'),
-                    summary=lift_get_strip(desc, 'summary'),
-                    release_date=release_date,
-                    next_release=next_release,
-                    version=lift_get_strip(desc, 'versionLabel')
-                )
-                to_add = set(keywords) - set(ds.keywords)
-                to_remove = set(ds.keywords) - set(keywords)
-                for kw in to_remove:
-                    ds.removeKeyword(kw)
-                for kw in to_add:
-                    ds.addKeyword(kw)
-                to_add = set(contacts) - set(ds.contacts)
-                to_remove = set(ds.contacts) - set(contacts)
-                for contact in to_remove:
-                    ds.removeContact(contact)
-                for contact in to_add:
-                    ds.addContact(contact)
+            for attr, existing, told in [('title', ds.title, lift_get_strip(desc, 'title')),
+                                         ('summary', ds.summary, lift_get_strip(desc, 'summary'))]:
+                if existing != told:
+                    print(f"{ds.uri} {attr} changed {existing} => {told}")
+                    if existing is None and told is not None:
+                        fresh_data = True
+                        ds.set(**{attr: told})
         except SQLObjectNotFound:
-            fresh_datasets = True
             ds = Dataset(
                 uri=ds_uri,
-                national_statistic=national_stats,
                 title=lift_get_strip(desc, 'title'),
+                summary=lift_get_strip(desc, 'summary'))
+            fresh_data = True
+        to_add = set(keywords) - set(ds.keywords)
+        for kw in to_add:
+            ds.addKeyword(kw)
+            fresh_data = True
+
+        this_dist = None
+        for dist in ds.distributions:
+            if dist.release_date == release_date and dist.uri == dist_uri: # assume it's the same one
+                this_dist = dist
+                for attr, existing, told in [('uri', dist.uri, dist_uri),
+                                             ('national_statistic', dist.national_statistic, national_stats),
+                                             ('version', dist.version, lift_get_strip(desc, 'version')),
+                                             ('edition', dist.edition, lift_get_strip(desc, 'edition')),
+                                             ('release', dist.release_date, release_date),
+                                             ('next_release', dist.next_release, next_release)]:
+                    if existing != told:
+                        print(f"{dist_uri} {attr} changed {existing} => {told}")
+                        if existing is None and told is not None:
+                            fresh_data = True
+                            dist.set(**{attr: told})
+        if this_dist is None:
+            this_dist = Distribution(
+                uri=dist_uri,
+                national_statistic=national_stats,
                 edition=lift_get_strip(desc, 'edition'),
-                summary=lift_get_strip(desc, 'summary'),
                 release_date=release_date,
                 next_release=next_release,
                 version=lift_get_strip(desc, 'versionLabel')
             )
-            for kw in keywords:
-                ds.addKeyword(kw)
-            for contact in contacts:
-                ds.addContact(contact)
+            fresh_data = True
+        if this_dist not in ds.distributions:
+            ds.addDistribution(this_dist)
+            fresh_data = True
+        to_add = set(contacts) - set(this_dist.contacts)
+        for contact in to_add:
+            dist.addContact(contact)
+
     start = start + limit
-    if not fresh_datasets or start >= datasets['totalItems']:
+    if not fresh_data or start >= datasets['totalItems']:
         still_going = False
