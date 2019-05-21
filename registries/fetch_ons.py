@@ -12,8 +12,7 @@ from requests import Session
 from sqlobject import connectionForURI, sqlhub, SQLObject, BoolCol, StringCol, DateTimeCol, SQLObjectNotFound, \
     RelatedJoin, DateCol
 
-#connection = connectionForURI('mysql://solar:system@sqldb/stats?charset=utf8')
-connection = connectionForURI('sqlite:ons')
+connection = connectionForURI('mysql://solar:system@sqldb/stats?charset=utf8')
 sqlhub.processConnection = connection
 
 
