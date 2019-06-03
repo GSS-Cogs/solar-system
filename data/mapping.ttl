@@ -393,14 +393,14 @@ map:ons_distribution_version a d2rq:PropertyBridge;
 	.
 map:ons_distribution_contact a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:ons_distribution;
-	d2rq:property wh:has_contact;
+	d2rq:property ons:has_contact;
 	d2rq:refersToClassMap map:ons_contact;
 	d2rq:join "ons_distribution.id <= ons_contact_ons_distribution.ons_distribution_id";
 	d2rq:join "ons_contact_ons_distribution.ons_contact_id => ons_contact.id";
 	.
 map:ons_dataset_distribution a d2rq:PropertyBridge;
 	d2rq:belongsToClassMap map:ons_dataset;
-	d2rq:property wh:has_distribution;
+	d2rq:property ons:has_distribution;
 	d2rq:refersToClassMap map:ons_distribution;
 	d2rq:join "ons_dataset.id <= ons_dataset_ons_distribution.ons_dataset_id";
 	d2rq:join "ons_dataset_ons_distribution.ons_distribution_id => ons_distribution.id";
