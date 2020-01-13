@@ -100,11 +100,13 @@ d3.json('dsdims').then(function (dsdims) {
 
   d3.json('dimcodes').then(function (dimcodes) {
     for (dimension in dimcodes.dimensions) {
-      dimcodes.dimensions[dimension].codelists.forEach(function (codelist) {
-        links.push({
-          source: dimension, target: codelist, distance: 30
+      if (dimensions.has(dimension)) {
+        dimcodes.dimensions[dimension].codelists.forEach(function (codelist) {
+          links.push({
+            source: dimension, target: codelist, distance: 30
+          });
         });
-      });
+      }
     }
     for (codelist in dimcodes.codelists) {
       nodes.push({
