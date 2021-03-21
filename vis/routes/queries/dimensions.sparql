@@ -1,0 +1,11 @@
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX qb: <http://purl.org/linked-data/cube#>
+PREFIX dcat: <http://www.w3.org/ns/dcat#>
+
+SELECT DISTINCT ?dimension ?label ?super
+WHERE {
+  ?dimension a qb:DimensionProperty .
+  FILTER (?dimension NOT IN (qb:measureType) )
+  OPTIONAL { ?dimension rdfs:label ?label }
+  OPTIONAL { ?dimension rdfs:subPropertyOf ?super }
+}

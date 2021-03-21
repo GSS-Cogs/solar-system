@@ -14,18 +14,18 @@
    limitations under the License.
 */
 
-var express = require('express');
-var router = express.Router();
-var sparql = require('sparql');
-var fs = require('fs');
-var path = require('path');
+let express = require('express');
+let router = express.Router();
+let sparql = require('sparql');
+let fs = require('fs');
+let path = require('path');
 
-var backupCodelists = require('./temp/codelists.json');
-var dsDimsQuery = fs.readFileSync(path.resolve(__dirname, 'queries/dataset-dimensions.sparql')).toString();
-var dsCodesQuery = fs.readFileSync(path.resolve(__dirname, 'queries/dataset-codelist.sparql')).toString();
+//var backupCodelists = require('./temp/codelists.json');
+let dsDimsQuery = fs.readFileSync(path.resolve(__dirname, 'queries/dataset-dimensions.sparql')).toString();
+let dimensionsQuery = fs.readFileSync(path.resolve(__dirname, 'queries/dimensions.sparql')).toString();
 
 router.get('/', function(req, res, next) {
-  if (req.originalUrl.slice(-1) != '/') {
+  if (req.originalUrl.slice(-1) !== '/') {
     res.redirect(301, req.originalUrl + '/');
   } else {
     res.render('family', {title: 'GSS Dataset Families'});
@@ -33,36 +33,52 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/dsdims', function(req, res, next) {
-  var client = new sparql.Client('https://production-drafter-ons-alpha.publishmydata.com/v1/sparql/live');
-  client.rows(dsDimsQuery, function(error, rows) {
+  const client = new sparql.Client('https://staging.gss-data.org.uk/sparql');
+  client.rows(dsDimsQuery, function(error, dsDimRows) {
     if (error) {
       res.render('error', {message: 'Error running SPARQL', error: error[1]});
     } else {
-      var datasets = {};
-      var dimensions = {};
-      rows.forEach(function(row) {
-        if (!datasets.hasOwnProperty(row.dataset.value)) {
-          var family = 'Trade';
-          if (row.hasOwnProperty('family')) {
-            family = row.family.value;
+      let datasets = {};
+      let dimensions = {};
+      let supers = {};
+      dsDimRows.forEach(function(dsDim) {
+        if (!datasets.hasOwnProperty(dsDim.dataset.value)) {
+          let theme = 'Trade';
+          if (dsDim.hasOwnProperty('theme')) {
+            theme = dsDim.theme.value;
           }
-          datasets[row.dataset.value] = {
-            label: row.datalabel.value,
-            dimensions: [row.dimension.value],
-            family: family
+          datasets[dsDim.dataset.value] = {
+            label: dsDim.datalabel.value,
+            dimensions: [dsDim.dimension.value],
+            theme: theme
           };
         } else {
-          datasets[row.dataset.value].dimensions.push(row.dimension.value);
+          datasets[dsDim.dataset.value].dimensions.push(dsDim.dimension.value);
         }
-        dimensions[row.dimension.value] = row.dimlabel.value;
       });
-      res.json({datasets: datasets, dimensions: dimensions});
+      client.rows(dimensionsQuery, function(error, dimSuperRows) {
+        dimSuperRows.forEach(function(dimSuper) {
+          if (dimSuper.hasOwnProperty('label')) {
+            dimensions[dimSuper.dimension.value] = dimSuper.label.value;
+          } else {
+            dimensions[dimSuper.dimension.value] = dimSuper.dimension.value;
+          }
+          if (dimSuper.hasOwnProperty('super')) {
+            if (!supers.hasOwnProperty(dimSuper.dimension.value)) {
+              supers[dimSuper.dimension.value] = [dimSuper.super.value];
+            } else {
+              supers[dimSuper.dimension.value].push(dimSuper.super.value);
+            }
+          }
+        });
+        res.json({datasets: datasets, dimensions: dimensions, supers: supers});
+      });
     }
   });
 });
-
+/*
 router.get('/dimcodes', function(req, res, next) {
-  var client = new sparql.Client('https://production-drafter-ons-alpha.publishmydata.com/v1/sparql/live');
+  var client = new sparql.Client('https://staging.gss-data.org.uk/sparql');
   client.rows(dsCodesQuery, function(error, rows) {
     if (error) {
 //      res.render('error', {message: 'Error running SPARQL', error: error[1]});
@@ -83,6 +99,6 @@ router.get('/dimcodes', function(req, res, next) {
       res.json({dimensions: dimensions, codelists: codelists});
     }
   });
-});
+}); */
 
 module.exports = router;

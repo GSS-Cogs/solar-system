@@ -5,11 +5,7 @@ PREFIX pmdqb: <http://publishmydata.com/def/qb/>
 
 SELECT DISTINCT ?dimension ?codelist ?codelistlabel
 WHERE {
-  [] a qb:DataSet ;
-     qb:structure/qb:component ?component .
-
-  ?component qb:dimension ?dimension ;
-     pmdqb:codesUsed / skos:member / skos:inScheme ?codelist .
-
+  ?dimension a qb:DimensionProperty ;
+    qb:codeList ?codelist .
   ?codelist rdfs:label ?codelistlabel .
 }

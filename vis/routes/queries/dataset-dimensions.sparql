@@ -1,15 +1,16 @@
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX qb: <http://purl.org/linked-data/cube#>
-PREFIX gdp: <http://gss-data.org.uk/def/gdp#>
+PREFIX pmdcat: <http://publishmydata.com/pmdcat#>
+PREFIX dcat: <http://www.w3.org/ns/dcat#>
 
-SELECT DISTINCT ?dataset ?datalabel ?dimension ?dimlabel ?family
+SELECT DISTINCT ?dataset ?datalabel ?dimension ?theme
 WHERE {
   ?dataset a qb:DataSet;
-       rdfs:label ?datalabel;
        qb:structure/qb:component/qb:dimension ?dimension .
-  ?dimension rdfs:label ?dimlabel .
+  [] pmdcat:datasetContents ?dataset;
+     rdfs:label ?datalabel .
   OPTIONAL {
-    ?dataset gdp:family [ rdfs:label ?family ]
+    ?dataset dcat:theme [ rdfs:label ?theme ]
   }
   FILTER (?dimension NOT IN (qb:measureType) )
 }
