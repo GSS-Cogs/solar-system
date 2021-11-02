@@ -53,7 +53,7 @@ forceManyBodySubset.initialize = function (nodes) {
 
 const simulation = d3.forceSimulation()
     .force("link", d3.forceLink().id(function (d) {return d.id;}))
-    .force("charge", forceManyBodySubset)
+    .force("charge", d3.forceManyBody().strength(-30))
     .force("collide", d3.forceCollide(20))
     .force("center", d3.forceCenter(width / 2, height / 2));
 

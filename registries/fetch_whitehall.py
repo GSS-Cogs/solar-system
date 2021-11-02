@@ -20,19 +20,21 @@ sqlhub.processConnection = connection
 DCAT = Namespace('http://www.w3.org/ns/dcat#')
 GDP = Namespace('http://gss-data.org.uk/def/gdp#')
 
-gss = Graph('SPARQLStore', identifier='http://gss-data.org.uk')
-gss.open("http://gss-data.org.uk/sparql")
+s = CacheControl(Session(),
+                 cache=FileCache('.cache'),
+                 heuristic=LastModified())
 
-orgs = {org.label.value: str(org.org) for org in gss.query(
-    """
+orgs = {org['label']['value']: org['org']['value'] for org in s.post(
+    'https://staging.gss-data.org.uk/sparql',
+    headers={'Accept': 'application/sparql-results+json'},
+    data={'query': '''
 PREFIX org: <http://www.w3.org/ns/org#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 SELECT DISTINCT ?org ?label
 WHERE {
   ?org a org:Organization ;
     rdfs:label ?label .
-}""")}
-
-gss.close()
+}'''}).json().get('results', {}).get('bindings', [])}
 
 
 class Organisation(SQLObject):
@@ -78,12 +80,13 @@ for label, uri in orgs.items():
         org = Organisation(uri=uri, label=label)
 
 datasets_url_base = 'https://www.gov.uk/government/statistics.json'
+gov_uk_search = 'https://www.gov.uk/api/search.json'
 
 s = CacheControl(Session(),
                  cache=FileCache('.cache'),
                  heuristic=LastModified())
 still_going = True
-datasets_url = datasets_url_base
+
 abbr_re = re.compile(r'<abbr title="([^"]+)">')
 collection_re = re.compile(r'Part of a collection: <a href="([^"]+)">')
 
@@ -104,6 +107,7 @@ def fetch_carefully(url):
 
 
 while still_going:
+
     datasets = fetch_carefully(datasets_url)
     fresh_datasets = False
     for res_obj in datasets['results']:
