@@ -3,6 +3,5 @@
 vis.iml
 .idea
 npm-debug.log
-package-lock.json
 Dockerfile
 node_modules

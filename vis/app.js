@@ -1,5 +1,5 @@
 /*
-   Copyright 2017 Alex Tucker
+   Copyright 2017-2021 Alex Tucker
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -12,42 +12,21 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
+ */
 
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var basicAuth = require('basic-auth');
-var proxy = require('http-proxy-middleware');
-var urlparse = require('url');
+const express = require('express');
+const path = require('path');
+const favicon = require('serve-favicon');
+const logger = require('morgan');
+const cookieParser = require('cookie-parser');
+const { createProxyMiddleware } = require('http-proxy-middleware');
+const urlparse = require('url');
 
-var topicvis = require('./routes/topicvis');
-var fdpvis = require('./routes/fdpvis');
-var familyvis = require('./routes/familyvis');
+const topicvis = require('./routes/topicvis');
+const fdpvis = require('./routes/fdpvis');
+const familyvis = require('./routes/familyvis');
 
-/* var auth = function (req, res, next) {
-  function unauthorized(res) {
-    res.set('WWW-Authenticate', 'Basic realm=Visual reports');
-    return res.send(401);
-  };
-
-  var user = basicAuth(req);
-
-  if (!user || !user.name || !user.pass) {
-    return unauthorized(res);
-  };
-
-  if (user.name === '<<someuser>>' && user.pass === '<<somepassword>>') {
-    return next();
-  } else {
-    return unauthorized(res);
-  };
-}; */
-
-var app = express();
+const app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -55,8 +34,6 @@ app.set('view engine', 'hjs');
 
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
-//app.use(bodyParser.json());
-//app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -98,18 +75,13 @@ app.get('/', function(req, res) {
 });
 
 // Forward D2R paths
-var fullPath = function(req) { return urlparse.parse(req.originalUrl).path; };
+const fullPath = function(req) { return urlparse.parse(req.originalUrl).path; };
 app.use(['/sparql', '/snorql/', '/dataset', '/all', '/directory/', '/resource/', '/page/'],
-        proxy({target: 'http://d2r:2020'}));
-/*          proxy('d2r:2020', {
-           https: false,
-           forwardPath: fullPath,
-           parseReqBody: false
-         })); */
+        createProxyMiddleware('http://d2r:2020'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  var err = new Error('Not Found');
+  const err = new Error('Not Found');
   err.status = 404;
   next(err);
 });

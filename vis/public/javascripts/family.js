@@ -1,5 +1,5 @@
 /*
-   Copyright 2018 Alex Tucker
+   Copyright 2021 Alex Tucker
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -84,7 +84,7 @@ d3.json('dsdims').then(function (dsdims) {
         nodes.push({
             id: dataset,
             label: dsdims.datasets[dataset].label,
-            context: dsdims.datasets[dataset].theme,
+            context: dsdims.datasets[dataset].themes.length > 0 ? dsdims.datasets[dataset].themes[0] : undefined,
             type: 'dataset',
             elementId: 'node' + elementId++
         });
@@ -100,7 +100,7 @@ d3.json('dsdims').then(function (dsdims) {
                 });
             }
         });
-        contexts.add(dsdims.datasets[dataset].theme);
+        contexts.add(dsdims.datasets[dataset].themes);
     }
     for (let dimension in dsdims.supers) {
         dsdims.supers[dimension].forEach(function(sup) {
@@ -186,7 +186,7 @@ d3.json('dsdims').then(function (dsdims) {
         .attr("class", "dataset").attr("x", -50).attr("y", -20)
         .attr("width", 100).attr("height", 40).attr("rx", 10).attr("ry", 10)
         .attr("fill", function (n) {
-            return color(n.context);
+            return n.context === undefined ? 'white' : color(n.context);
         })
         .attr("stroke", "#555555")
         .each(function (n) {

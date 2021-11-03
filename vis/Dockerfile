@@ -1,11 +1,11 @@
-FROM node:10-alpine AS base
+FROM node:lts-alpine AS base
 MAINTAINER Alex Tucker <alex@floop.org.uk>
 
 WORKDIR /app
-COPY package.json ./
-RUN npm install
+COPY package.json package-lock.json ./
+RUN npm ci
 
-FROM node:10-alpine AS release
+FROM node:lts-alpine AS release
 COPY --from=base /app/node_modules /app/node_modules
 COPY --from=base /app/package-lock.json /app/
 EXPOSE 3000

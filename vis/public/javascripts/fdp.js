@@ -14,11 +14,11 @@
    limitations under the License.
 */
 
-var chart = document.getElementById("chart");
-var svg = d3.select(chart).append("svg");
-var radius = 4;
+const chart = document.getElementById("chart");
+const svg = d3.select(chart).append("svg");
+const radius = 4;
 
-var svgCss = ".links line {\
+const svgCss = ".links line {\
   stroke: #999;\
   stroke-opacity: 0.1;\
 }\
@@ -40,7 +40,7 @@ svg.attr("title", "Solar System")
   .attr("xmlns", "http://www.w3.org/2000/svg")
   .append("style").text(svgCss);
 
-var width, height;
+let width, height;
 
 function redraw() {
   width = chart.clientWidth;
@@ -54,33 +54,35 @@ redraw();
 
 window.addEventListener("resize", redraw);
 
-var color = d3.scaleOrdinal(d3.schemeDark2);
+const color = d3.scaleOrdinal(d3.schemeDark2);
 
-var forceManyBodySubset = d3.forceManyBody();
-var forceManyBodyInitialize = forceManyBodySubset.initialize;
+const forceManyBodySubset = d3.forceManyBody();
+const forceManyBodyInitialize = forceManyBodySubset.initialize;
 forceManyBodySubset.initialize = function(nodes) {
   forceManyBodyInitialize(nodes.filter(function(n, i) {
     return n.type === 'topic';
   }));
 }
 
-var simulation = d3.forceSimulation()
-    .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(16))
+const simulation = d3.forceSimulation()
+    .force("link", d3.forceLink().id(function (d) {
+      return d.id;
+    }).distance(16))
     .force("charge", forceManyBodySubset)
     .force("collide", d3.forceCollide(4))
     .force("center", d3.forceCenter(width / 2, height / 2));
 
-var tooltip = d3.select("body").append("div")
+const tooltip = d3.select("body").append("div")
     .attr("class", "tooltip")
     .style("opacity", 0);
 
-var nodes = [];
-var links = [];
-var topics = d3.set();
-var contexts = d3.set();
+const nodes = [];
+const links = [];
+const topics = d3.set();
+const contexts = d3.set();
 
 d3.json('datasets').then(function(datasets) {
-  for (dataset in datasets) {
+  for (let dataset in datasets) {
     nodes.push({
       id: dataset,
       name: datasets[dataset].name,
@@ -106,14 +108,16 @@ d3.json('datasets').then(function(datasets) {
       });
     });
 
-    var svgLegend = svg.append("g")
+    const svgLegend = svg.append("g")
         .attr("class", "legend")
         .attr('x', 0)
         .attr('y', 0)
         .selectAll(".category")
-        .data(contexts.values().sort().map(function(c) {return {id: c};}))
+        .data(contexts.values().sort().map(function (c) {
+          return {id: c};
+        }))
         .enter().append('g')
-        .attr('class', 'category')
+        .attr('class', 'category');
 
     svgLegend.append('rect')
       .attr('x', 10)
@@ -128,46 +132,52 @@ d3.json('datasets').then(function(datasets) {
       .attr('y', function(d, i) { return 40 + i * 15; })
       .text(function(d) { return d.id; });
 
-    var svgNodes = svg.append("g")
+    const svgNodes = svg.append("g")
         .attr("class", "nodes")
         .selectAll("circle")
-        .data(nodes.filter(function(n, i) {
+        .data(nodes.filter(function (n, i) {
           return n.type !== 'topic';
         }))
         .enter().append("circle")
         .attr("r", 3)
-        .attr("fill", function(n) { return color(n.context); })
-        .on("mouseover", function(d) {
-          tooltip.transition()
-            .duration(200)
-            .style("opacity", .9);
-          tooltip.html(d.name)
-            .style("left", (d3.event.pageX) + "px")
-            .style("top", (d3.event.pageY - 28) + "px");
+        .attr("fill", function (n) {
+          return color(n.context);
         })
-        .on("mouseout", function(d) {
+        .on("mouseover", function (d) {
           tooltip.transition()
-            .duration(500)
-            .style("opacity", 0);
+              .duration(200)
+              .style("opacity", .9);
+          tooltip.html(d.name)
+              .style("left", (d3.event.pageX) + "px")
+              .style("top", (d3.event.pageY - 28) + "px");
+        })
+        .on("mouseout", function (d) {
+          tooltip.transition()
+              .duration(500)
+              .style("opacity", 0);
         })
         .call(d3.drag()
-              .on("start", dragstarted)
-              .on("drag", dragged)
-              .on("end", dragended));
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            .on("end", dragended));
 
-    var svgLinks = svg.append("g")
+    const svgLinks = svg.append("g")
         .attr("class", "links")
         .selectAll("line")
         .data(links)
         .enter().append("line");
 
-    var svgTopics = svg.append("g")
+    const svgTopics = svg.append("g")
         .attr("class", "topics")
         .selectAll("text")
-        .data(nodes.filter(function(n, i) {return n.type === 'topic';}))
-        .enter().append("text").text(function(n) {return n.label;})
+        .data(nodes.filter(function (n, i) {
+          return n.type === 'topic';
+        }))
+        .enter().append("text").text(function (n) {
+          return n.label;
+        });
 
-    var wrap = d3.textwrap()
+    const wrap = d3.textwrap()
         .bounds({height: 40, width: 80})
         .method('tspans');
     d3.selectAll('.topics text').call(wrap);
@@ -219,11 +229,11 @@ function dragended(d) {
 d3.select('#generate').on('click', downloadSVG);
 
 function downloadSVG() {
-  var svg = d3.select("svg")
+  const svg = d3.select("svg")
       .attr("title", "Solar System")
       .attr("version", 1.1)
       .attr("xmlns", "http://www.w3.org/2000/svg")
       .node().parentNode.innerHTML;
-  var blob = new Blob([svg], {type: "image/svg+xml"});
+  const blob = new Blob([svg], {type: "image/svg+xml"});
   saveAs(blob, "ons-solar-system.svg");
 };

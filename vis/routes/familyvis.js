@@ -1,5 +1,5 @@
 /*
-   Copyright 2018 Alex Tucker
+   Copyright 2018-2021 Alex Tucker
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
+ */
 
 let express = require('express');
 let router = express.Router();
@@ -42,18 +42,17 @@ router.get('/dsdims', function(req, res, next) {
       let dimensions = {};
       let supers = {};
       dsDimRows.forEach(function(dsDim) {
-        if (!datasets.hasOwnProperty(dsDim.dataset.value)) {
-          let theme = 'Trade';
-          if (dsDim.hasOwnProperty('theme')) {
-            theme = dsDim.theme.value;
-          }
-          datasets[dsDim.dataset.value] = {
+        const ds = dsDim.dataset.value;
+        if (!datasets.hasOwnProperty(ds)) {
+          datasets[ds] = {
             label: dsDim.datalabel.value,
-            dimensions: [dsDim.dimension.value],
-            theme: theme
+            dimensions: [],
+            themes: []
           };
-        } else {
-          datasets[dsDim.dataset.value].dimensions.push(dsDim.dimension.value);
+        }
+        datasets[ds].dimensions.push(dsDim.dimension.value);
+        if (dsDim.hasOwnProperty('theme')) {
+          datasets[ds].themes = [... new Set(datasets[ds].themes).add(dsDim.theme.value)];
         }
       });
       client.rows(dimensionsQuery, function(error, dimSuperRows) {

@@ -1,5 +1,5 @@
 /*
-   Copyright 2017 Alex Tucker
+   Copyright 2017-2021 Alex Tucker
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -12,17 +12,17 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-*/
+ */
 
-var express = require('express');
-var router = express.Router();
-var fs = require('fs');
-var async = require('async');
-var sparql = require('sparql');
-var moment = require('moment');
+const express = require('express');
+const router = express.Router();
+const fs = require('fs');
+const async = require('async');
+const sparql = require('sparql');
+const moment = require('moment');
 
 router.get('/', function(req, res, next) {
-  var client = new sparql.Client('http://d2r:2020/sparql');
+  const client = new sparql.Client('http://d2r:2020/sparql');
   client.rows(`PREFIX ss: <https://ons.gov.uk/ns/solarsystem#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 SELECT ?org ?label WHERE {
@@ -34,7 +34,7 @@ SELECT ?org ?label WHERE {
     if (error) {
       res.render('error', {message: 'Error running SPARQL', error: error[1]});
     } else {
-      var types = {'topic': {short: 'Topic'}};
+      const types = {'topic': {short: 'Topic'}};
       rows.forEach(function(row) {
         types[row.org.value] = {short: row.label.value};
       });
@@ -68,7 +68,7 @@ SELECT ?org ?label WHERE {
 });
 
 router.get('/data.json', function(req, res, next) {
-  var client = new sparql.Client('http://d2r:2020/sparql');
+  const client = new sparql.Client('http://d2r:2020/sparql');
   client.rows(`PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX ss: <https://ons.gov.uk/ns/solarsystem#>
 SELECT DISTINCT * WHERE {
@@ -83,7 +83,7 @@ SELECT DISTINCT * WHERE {
     if (error) {
       res.render('error', {message: 'Error running SPARQL', error: error[1]});
     } else {
-      var data = {}
+      const data = {};
       rows.forEach(function(row) {
         if (!data.hasOwnProperty(row.dataset.value)) {
           data[row.dataset.value] = {
@@ -117,8 +117,8 @@ SELECT DISTINCT * WHERE {
 });
 
 router.get('/dataset', function(req, res, next) {
-  var client = new sparql.Client('http://d2r:2020/sparql');
-  var escapeName = req.query.name.replace(/["]/g, '\\$&');
+  const client = new sparql.Client('http://d2r:2020/sparql');
+  const escapeName = req.query.name.replace(/["]/g, '\\$&');
   client.rows(`PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX ss: <https://ons.gov.uk/ns/solarsystem#>
 SELECT ?dataset ?freq ?link ?status ?orgLink ?orgLabel WHERE {
@@ -137,14 +137,14 @@ SELECT ?dataset ?freq ?link ?status ?orgLink ?orgLabel WHERE {
     } else if (datasetRows.length !== 1) {
       res.render('error', {message: 'Problem looking up dataset'});
     } else {
-      var details = {
+      const details = {
         'dataset': datasetRows[0].dataset.value,
         'label': req.query.name,
         'orgLabel': datasetRows[0].orgLabel.value
       };
       if (datasetRows[0].hasOwnProperty('freq')) {
-        var duration = moment.duration(datasetRows[0].freq.value);
-        var durations = [];
+        const duration = moment.duration(datasetRows[0].freq.value);
+        const durations = [];
         ['years', 'months', 'days'].forEach(function(period) {
           if (duration[period]() > 0) {
             if (duration[period]() > 1) {

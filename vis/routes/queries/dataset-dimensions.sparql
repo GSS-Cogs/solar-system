@@ -5,12 +5,12 @@ PREFIX dcat: <http://www.w3.org/ns/dcat#>
 
 SELECT DISTINCT ?dataset ?datalabel ?dimension ?theme
 WHERE {
-  ?dataset a qb:DataSet;
-       qb:structure/qb:component/qb:dimension ?dimension .
-  [] pmdcat:datasetContents ?dataset;
-     rdfs:label ?datalabel .
-  OPTIONAL {
-    ?dataset dcat:theme [ rdfs:label ?theme ]
-  }
-  FILTER (?dimension NOT IN (qb:measureType) )
+    ?dataset a qb:DataSet;
+        qb:structure/qb:component/qb:dimension ?dimension ;
+        ^pmdcat:datasetContents ?record .
+    ?record rdfs:label ?datalabel .
+    OPTIONAL {
+        ?record dcat:theme [ rdfs:label ?theme ]
+    }
+    FILTER (?dimension NOT IN (qb:measureType) )
 }
