@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3.8'
 
 services:
 
@@ -9,12 +9,11 @@ services:
       - d2r
       - stats-registry
     environment:
-      - VIRTUAL_HOST=ons.floop.org.uk
-      - LETSENCRYPT_HOST=ons.floop.org.uk
-      - LETSENCRYPT_EMAIL=alex@floop.org.uk
+      - VIRTUAL_HOST=solar.ukstats.dev
+      - LETSENCRYPT_HOST=solar.ukstats.dev
     restart: always
     networks:
-      - cloudfluff_proxy
+      - cogs_proxy
       - default
 
   sqldb:
@@ -34,7 +33,7 @@ services:
     volumes:
       - solardata:/var/lib/d2rq:z
     environment:
-      - D2R_BASEURI=https://ons.floop.org.uk/
+      - D2R_BASEURI=https://solar.ukstats.dev/
     links:
       - sqldb
     restart: always
@@ -55,5 +54,5 @@ volumes:
   registry:
 
 networks:
-  cloudfluff_proxy:
+  cogs_proxy:
     external: true
