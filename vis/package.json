@@ -9,7 +9,7 @@
   "author": "Alex Tucker <alex@floop.org.uk>",
   "license": "Apache-2.0",
   "dependencies": {
-    "async": "^2.6.2",
+    "async": "^3.2.2",
     "basic-auth": "^2.0.1",
     "body-parser": "^1.19.1",
     "bootstrap": "^3.4.1",
