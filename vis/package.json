@@ -21,7 +21,7 @@
     "d3plus": "^1.9.8",
     "d3plus-text": "^0.9.43",
     "debug": "^4.3.3",
-    "express": "^4.17.2",
+    "express": "^4.17.3",
     "express-http-proxy": "^1.6.3",
     "file-saver": "^2.0.2",
     "hjs": "0.0.6",
